@@ -20,7 +20,7 @@ This assignment just helps us to evaluate level of your skills. You don't have t
 ### Handover ###
 
 * Create a private fork of this repository
-* Assign admin rights to jozef.knazko@goodrequest.com
+* Assign admin rights to roman.behul@goodrequest.com
 * Create develop branch
 * Do all 3 task in order after each other in 3 separated commits
 * Share repository to **roman.behul@goodrequest.com** and **milos.zelko@goodrequest.com**
