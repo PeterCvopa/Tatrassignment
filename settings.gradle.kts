@@ -12,5 +12,5 @@ dependencyResolutionManagement {
     }
 }
 
-include ':app'
+include(":app")
 rootProject.name = "Hiring"

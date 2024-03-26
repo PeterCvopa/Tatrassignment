@@ -1,0 +1,111 @@
+[versions]
+
+hilt_extension_version = "1.2.0"
+hilt_version = "2.48.1"
+dagger_version = "2.48.1"
+leakcanary-android_verions = "3.0-alpha-1"
+timber_version = "5.0.1"
+lifecycle_version = "2.7.0"
+fragment_version = "2.6.2"
+agp_version = "8.2.2"
+kotlin_version = "1.9.20"
+ksp_version = "1.9.20-1.0.14"
+androidx_core_version = "1.12.0"
+androidx_compose_bom_version = "2024.03.00"
+retrofit_version = "2.9.0"
+guava_version = "33.0.0-android"
+interceptor_version = "4.11.0"
+junit_version = "4.13.2"
+mockk_version = "1.13.9"
+coroutines_version ="1.7.1"
+tubine_version ="1.0.0"
+junit = "1.1.5"
+espresso-core = "3.5.1"
+appcompat = "1.6.1"
+material = "1.11.0"
+activity_version = "1.8.2"
+material_version = "1.11.0"
+swipe_refresh_layout_version = "1.1.0"
+coil_version = "2.4.0"
+kapt_version = "1.6.0"
+
+[libraries]
+
+#android
+android-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity_version" }
+
+#material
+android-material = { module = "com.google.android.material:material", version.ref = "material_version" }
+
+#swipe refresh layout
+swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swipe_refresh_layout_version" }
+
+#okhttp
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "interceptor_version" }
+okhttp-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "interceptor_version" }
+
+#coil
+coil = { module = "io.coil-kt:coil", version.ref = "coil_version" }
+
+gradle = { module = "com.android.tools.build:gradle", version.ref = "agp_version" }
+
+#Timber
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary-android_verions" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber_version" }
+
+#hilt
+hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }
+hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt_version" }
+hilt-lifecycle = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt_extension_version" }
+hilt-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt_extension_version" }
+
+# dagger
+dagger-base = { module = "com.google.dagger:dagger", version.ref = "dagger_version" }
+dagger-android = { module = "com.google.dagger:dagger-android", version.ref = "dagger_version" }
+dagger-android-support = { module = "com.google.dagger:dagger-android-support", version.ref = "dagger_version" }
+
+#lifecycle
+lifecycle-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle_version" }
+lifecycle-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle_version" }
+lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle_version" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle_version" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle_version" }
+lifecycle-savestate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle_version" }
+lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "lifecycle_version" }
+
+# core
+core = { module = "androidx.core:core-ktx", version.ref = "androidx_core_version" }
+
+#compose
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx_compose_bom_version" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-preview = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-material2 = { group = "androidx.compose.material", name = "material" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+#retrofit
+retrofit-base = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
+retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit_version" }
+
+
+#guava
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava_version" }
+
+#testing
+junit = { module = "junit:junit", version.ref = "junit_version" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk_version" }
+coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines_version" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "tubine_version"}
+junit-compose = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+junit-compose-ui-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+[plugins]
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt_version" }
+android-application = { id = "com.android.application", version.ref = "agp_version" }
+android-library = { id = "com.android.library", version.ref = "agp_version" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_version" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp_version" }
