@@ -1,13 +1,13 @@
 package com.goodrequest.hiring.ui.pokedex
 
 import androidx.lifecycle.viewModelScope
-import com.cvopa.peter.fetchy.ui.base.BaseViewModel
 import com.goodrequest.hiring.R
-import com.goodrequest.hiring.api.PokemonRepository
-import com.goodrequest.hiring.api.PokemonResult
-import com.goodrequest.hiring.model.PokemonData
+import com.goodrequest.hiring.api.PokemonManager
+import com.goodrequest.hiring.api.PokemonWithDetailResult
 import com.goodrequest.hiring.model.PokemonError
+import com.goodrequest.hiring.model.PokemonInfo
 import com.goodrequest.hiring.model.PokemonListState
+import com.goodrequest.hiring.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -18,34 +18,34 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PokemonViewModel @Inject constructor(
-    private val repository: PokemonRepository,
+    private val repository: PokemonManager,
 ) : BaseViewModel<PokemonListState>() {
 
     init {
-        onEvent(Event.OnLoad)
+        onEvent(Event.OnRefresh)
     }
 
     private val sideEffectChannel = Channel<Actions>(capacity = Channel.BUFFERED)
+
     val sideEffectFlow: Flow<Actions>
         get() = sideEffectChannel.receiveAsFlow()
 
     override val initialState: PokemonListState
         get() = PokemonListState(isRefreshing = true)
 
-    private fun load() {
-        Timber.d("peter Loading pokemons")
-        emitState(state.value.copy(isRefreshing = true))
+    private fun load(page: Int = INIT_PAGE_INDEX) {
+        setStateRefreshing()
         viewModelScope.launch {
-            repository.loadPokemons()
+            repository.loadPokemonsWithDetail(page)
                 .collect { pokemonResult ->
                     when (pokemonResult) {
-                        is PokemonResult.Error -> {
+                        is PokemonWithDetailResult.Error -> {
                             val errorState = pokemonResult.toPokemonError()
                             sideEffectChannel.send(Actions.ShowSnackbar(errorState.messageRes))
                             emitState(state.value.copy(error = errorState, isRefreshing = false))
                         }
 
-                        is PokemonResult.Data -> {
+                        is PokemonWithDetailResult.Data -> {
                             emitState(
                                 PokemonListState(
                                     pokemonList = pokemonResult.pokemons,
@@ -61,26 +61,36 @@ class PokemonViewModel @Inject constructor(
 
     fun onEvent(it: Event) {
         when (it) {
-            is Event.OnLoad -> load()
+            is Event.OnRefresh -> load()
             is Event.OnPokemonClicked -> {
                 Timber.d("Pokemon ${it.pokemon} loves you!")
             }
+            is Event.OnLoadMore -> {
+                load(it.page)
+            }
         }
+    }
+
+    private fun setStateRefreshing() {
+        emitState(state.value.copy(isRefreshing = true))
     }
 }
 
 sealed class Event {
-    data object OnLoad : Event()
-    data class OnPokemonClicked(val pokemon: PokemonData) : Event()
+    data object OnRefresh : Event()
+    data class OnLoadMore(val page: Int) : Event()
+    data class OnPokemonClicked(val pokemon: PokemonInfo) : Event()
 }
 
 sealed class Actions {
     data class ShowSnackbar(val messageRes: Int) : Actions()
 }
 
-fun PokemonResult.Error.toPokemonError(): PokemonError {
+fun PokemonWithDetailResult.Error.toPokemonError(): PokemonError {
     return when (this) {
-        is PokemonResult.Error.NetworkError -> PokemonError.NetworkError(R.string.error_network)
-        is PokemonResult.Error.UnknownError -> PokemonError.UnknownError(R.string.error_unknown)
+        is PokemonWithDetailResult.Error.NetworkError -> PokemonError.NetworkError(R.string.error_network)
+        is PokemonWithDetailResult.Error.UnknownError -> PokemonError.UnknownError(R.string.error_unknown)
     }
 }
+
+const val INIT_PAGE_INDEX = 1

@@ -1,4 +1,4 @@
-package com.cvopa.peter.fetchy.ui.base
+package com.goodrequest.hiring.ui.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

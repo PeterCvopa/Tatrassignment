@@ -30,7 +30,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.cvopa.peter.fetchy.ui.theme.PokedexTheme
 import com.cvopa.peter.fetchy.util.compose.SingleEventEffect
 import com.goodrequest.hiring.model.PokemonListState
-import com.goodrequest.hiring.ui.components.PullToRefreshLazyColumn
+import com.goodrequest.hiring.ui.components.PullToRefreshLazyColumnWithState
+import com.goodrequest.hiring.ui.components.RefreshType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -97,7 +98,7 @@ private fun PokemonsScreen(
             if (state.error != null) {
                 Button(
                     modifier = Modifier.padding(16.dp),
-                    onClick = { onEvent(Event.OnLoad) }) {
+                    onClick = { onEvent(Event.OnRefresh) }) {
                     Text("Retry")
                 }
             }
@@ -108,10 +109,16 @@ private fun PokemonsScreen(
 
 @Composable
 fun Pokemons(pokemonListState: PokemonListState, onEvent: (Event) -> Unit = {}) {
-    PullToRefreshLazyColumn(
+    PullToRefreshLazyColumnWithState(
         items = pokemonListState.pokemonList,
         isRefreshing = pokemonListState.isRefreshing,
-        onRefresh = { onEvent(Event.OnLoad) }
+        onRefresh = {
+            when (it) {
+                is RefreshType.Pull -> onEvent(Event.OnRefresh)
+                is RefreshType.Retry -> onEvent(Event.OnRefresh)
+                is RefreshType.Paging -> onEvent(Event.OnLoadMore(it.page))
+            }
+        }
     ) { pokemon ->
         PokemonItem(pokemon)
     }

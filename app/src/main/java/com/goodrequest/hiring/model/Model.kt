@@ -1,9 +1,12 @@
 package com.goodrequest.hiring.model
 
+import com.goodrequest.hiring.api.PokemonWithDetail
+
 data class PokemonListState(
-    val pokemonList: List<PokemonData> = emptyList(),
+    val pokemonList: List<PokemonWithDetail> = emptyList(),
     val isRefreshing: Boolean = false,
     val error: PokemonError? = null,
+    val nextLoadPage : Int = 1,
 )
 
 sealed class PokemonError(open val messageRes: Int) {
@@ -11,7 +14,7 @@ sealed class PokemonError(open val messageRes: Int) {
     data class UnknownError(override val messageRes: Int) : PokemonError(messageRes)
 }
 
-data class PokemonData(
+data class PokemonInfo(
     val id: String,
     val name: String,
 )

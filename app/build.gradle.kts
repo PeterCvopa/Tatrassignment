@@ -94,6 +94,11 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.preview)
-    implementation("eu.bambooapps:compose-material3-pullrefresh:1.0.0")
     implementation(libs.androidx.compose.material3)
+    // pull-to-refresh
+    implementation(libs.compose.material3.pullrefresh)
+
+    // coil
+
+    implementation(libs.coil)
 }

@@ -2,4 +2,6 @@
     <string name="app_name">Hiring</string>
     <string name="error_network">Cannot reach server</string>
     <string name="error_unknown">Something went terribly wrong!</string>
+    <string name="move">Move:</string>
+    <string name="name">Name:</string>
 </resources>
