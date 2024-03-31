@@ -1,4 +1,4 @@
-package com.cvopa.peter.fetchy.ui.theme
+package com.goodrequest.hiring.ui.theme
 
 import android.app.Activity
 import android.os.Build

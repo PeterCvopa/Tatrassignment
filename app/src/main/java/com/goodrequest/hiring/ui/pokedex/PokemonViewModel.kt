@@ -4,9 +4,11 @@ import androidx.lifecycle.viewModelScope
 import com.goodrequest.hiring.R
 import com.goodrequest.hiring.api.PokemonManager
 import com.goodrequest.hiring.api.PokemonWithDetailResult
-import com.goodrequest.hiring.model.PokemonError
+import com.goodrequest.hiring.model.PagingState
 import com.goodrequest.hiring.model.PokemonInfo
 import com.goodrequest.hiring.model.PokemonListState
+import com.goodrequest.hiring.model.PokemonWithDetail
+import com.goodrequest.hiring.model.PullDownErrorState
 import com.goodrequest.hiring.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -31,28 +33,65 @@ class PokemonViewModel @Inject constructor(
         get() = sideEffectChannel.receiveAsFlow()
 
     override val initialState: PokemonListState
-        get() = PokemonListState(isRefreshing = true)
+        get() = PokemonListState(isPullRefreshing = true)
 
-    private fun load(page: Int = INIT_PAGE_INDEX) {
-        setStateRefreshing()
+    private fun fullLoad() {
+        emitState(state.value.copy(isPullRefreshing = true))
         viewModelScope.launch {
-            repository.loadPokemonsWithDetail(page)
+            load(onSuccess = { pokemons ->
+                emitState(
+                    PokemonListState(
+                        pokemonList = pokemons,
+                        pullDownError = null,
+                        isPullRefreshing = false
+                    )
+                )
+            }, onError = { errorState ->
+                sideEffectChannel.send(Actions.ShowSnackbar(errorState.messageRes))
+                emitState(state.value.copy(pullDownError = errorState, isPullRefreshing = false))
+            })
+        }
+    }
+
+    private fun pagingLoad() {
+        emitState(state.value.copy(pagingState = PagingState.Refreshing))
+        val nextPage = state.value.nextPage
+        viewModelScope.launch {
+            load(nextPage,
+                onSuccess = { pokemons ->
+                    emitState(
+                        PokemonListState(
+                            pokemonList = state.value.pokemonList + pokemons,
+                            pullDownError = null,
+                            isPullRefreshing = false,
+                            pagingState = null,
+                            nextPage = nextPage + 1
+                        )
+                    )
+                },
+                onError = { _ ->
+                    emitState(
+                        state.value.copy(
+                            pagingState = PagingState.Error,
+                            isPullRefreshing = false
+                        )
+                    )
+                })
+        }
+    }
+
+    private fun load(page: Int = INIT_PAGE_INDEX, onSuccess: (List<PokemonWithDetail>) -> Unit, onError: suspend (PullDownErrorState) -> Unit) {
+        viewModelScope.launch {
+            repository
+                .loadPokemonsWithDetail(page)
                 .collect { pokemonResult ->
                     when (pokemonResult) {
-                        is PokemonWithDetailResult.Error -> {
-                            val errorState = pokemonResult.toPokemonError()
-                            sideEffectChannel.send(Actions.ShowSnackbar(errorState.messageRes))
-                            emitState(state.value.copy(error = errorState, isRefreshing = false))
+                        is PokemonWithDetailResult.Data -> {
+                            onSuccess(pokemonResult.pokemons)
                         }
 
-                        is PokemonWithDetailResult.Data -> {
-                            emitState(
-                                PokemonListState(
-                                    pokemonList = pokemonResult.pokemons,
-                                    error = null,
-                                    isRefreshing = false
-                                )
-                            )
+                        is PokemonWithDetailResult.Error -> {
+                            onError(pokemonResult.toPokemonError())
                         }
                     }
                 }
@@ -61,24 +100,20 @@ class PokemonViewModel @Inject constructor(
 
     fun onEvent(it: Event) {
         when (it) {
-            is Event.OnRefresh -> load()
+            is Event.OnRefresh -> fullLoad()
             is Event.OnPokemonClicked -> {
-                Timber.d("Pokemon ${it.pokemon} loves you!")
+                Timber.d("Pokemon ${it.pokemon.name} loves you!")
             }
             is Event.OnLoadMore -> {
-                load(it.page)
+                pagingLoad()
             }
         }
-    }
-
-    private fun setStateRefreshing() {
-        emitState(state.value.copy(isRefreshing = true))
     }
 }
 
 sealed class Event {
     data object OnRefresh : Event()
-    data class OnLoadMore(val page: Int) : Event()
+    data object OnLoadMore : Event()
     data class OnPokemonClicked(val pokemon: PokemonInfo) : Event()
 }
 
@@ -86,11 +121,11 @@ sealed class Actions {
     data class ShowSnackbar(val messageRes: Int) : Actions()
 }
 
-fun PokemonWithDetailResult.Error.toPokemonError(): PokemonError {
+fun PokemonWithDetailResult.Error.toPokemonError(): PullDownErrorState {
     return when (this) {
-        is PokemonWithDetailResult.Error.NetworkError -> PokemonError.NetworkError(R.string.error_network)
-        is PokemonWithDetailResult.Error.UnknownError -> PokemonError.UnknownError(R.string.error_unknown)
+        is PokemonWithDetailResult.Error.NetworkError -> PullDownErrorState.NetworkError(R.string.error_network)
+        is PokemonWithDetailResult.Error.UnknownError -> PullDownErrorState.UnknownError(R.string.error_unknown)
     }
 }
 
-const val INIT_PAGE_INDEX = 1
+const val INIT_PAGE_INDEX = 0

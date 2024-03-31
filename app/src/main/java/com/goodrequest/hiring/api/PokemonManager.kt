@@ -1,6 +1,8 @@
 package com.goodrequest.hiring.api
 
+import com.goodrequest.hiring.model.PokemonDetail
 import com.goodrequest.hiring.model.PokemonInfo
+import com.goodrequest.hiring.model.PokemonWithDetail
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -21,7 +23,7 @@ class PokemonRepositoryImpl
 
     private suspend fun loadPokemons(page: Int): PokemonsResult {
         return runCatching<PokemonsResult> {
-            val pokemons = pokemonService.getPokemons(limit = 20)
+            val pokemons = pokemonService.getPokemons(limit = 20, offset = page.pageToOffset())
             PokemonsResult.Data(pokemons.results.map { PokemonInfo(it.url, it.name) })
         }
             .onFailure {
@@ -60,18 +62,6 @@ class PokemonRepositoryImpl
     }
 }
 
-private fun Int.pageToOffset(): Int {
-    return this * 20
-}
-
-private fun PokemonDetailResponse.toDetail(): PokemonDetail {
-    return PokemonDetail(
-        move = moves.first().move.name,
-        imageUrl = sprites.front_default,
-        weight = weight
-    )
-}
-
 sealed class PokemonWithDetailResult {
     data class Data(val pokemons: List<PokemonWithDetail>) : PokemonWithDetailResult()
     sealed class Error : PokemonWithDetailResult() {
@@ -88,8 +78,15 @@ sealed class PokemonsResult {
     }
 }
 
-data class PokemonDetail(
-    val move: String,
-    val imageUrl: String,
-    val weight: Int,
-)
+
+private fun Int.pageToOffset(): Int {
+    return (this) * 20
+}
+
+private fun PokemonDetailResponse.toDetail(): PokemonDetail {
+    return PokemonDetail(
+        move = moves.first().move.name,
+        imageUrl = sprites.imageUrl,
+        weight = weight
+    )
+}

@@ -1,18 +1,11 @@
-package com.cvopa.peter.fetchy.util.compose
+package com.goodrequest.hiring.ui
 
-import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.Flow
-
-@Composable
-fun isLandscape(): Boolean {
-    return LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-}
 
 @Composable
 fun <T : Any> SingleEventEffect(

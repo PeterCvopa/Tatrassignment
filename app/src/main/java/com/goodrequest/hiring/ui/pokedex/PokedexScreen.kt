@@ -27,10 +27,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.cvopa.peter.fetchy.ui.theme.PokedexTheme
-import com.cvopa.peter.fetchy.util.compose.SingleEventEffect
+import com.goodrequest.hiring.ui.theme.PokedexTheme
+import com.goodrequest.hiring.ui.SingleEventEffect
 import com.goodrequest.hiring.model.PokemonListState
-import com.goodrequest.hiring.ui.components.PullToRefreshLazyColumnWithState
+import com.goodrequest.hiring.ui.components.PullToRefreshLazyColumnWithStateIndicator
 import com.goodrequest.hiring.ui.components.RefreshType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -88,41 +88,39 @@ private fun PokemonsScreen(
                 )
             }
         },
-    ) {
+    ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            if (state.error != null) {
+            if (state.pullDownError != null) {
                 Button(
                     modifier = Modifier.padding(16.dp),
                     onClick = { onEvent(Event.OnRefresh) }) {
                     Text("Retry")
                 }
             }
-            Pokemons(state, onEvent)
+            PullToRefreshLazyColumnWithStateIndicator(
+                items = state.pokemonList,
+                isRefreshing = state.isPullRefreshing,
+                onRefresh = { refreshingType ->
+                    when (refreshingType) {
+                        is RefreshType.Pull -> onEvent(Event.OnRefresh)
+                        is RefreshType.Retry -> onEvent(Event.OnRefresh)
+                        is RefreshType.Paging -> onEvent(Event.OnLoadMore)
+                    }
+                },
+                pagingState = state.pagingState,
+            ) { pokemon ->
+                PokemonItem(pokemon)
+            }
         }
     }
 }
 
-@Composable
-fun Pokemons(pokemonListState: PokemonListState, onEvent: (Event) -> Unit = {}) {
-    PullToRefreshLazyColumnWithState(
-        items = pokemonListState.pokemonList,
-        isRefreshing = pokemonListState.isRefreshing,
-        onRefresh = {
-            when (it) {
-                is RefreshType.Pull -> onEvent(Event.OnRefresh)
-                is RefreshType.Retry -> onEvent(Event.OnRefresh)
-                is RefreshType.Paging -> onEvent(Event.OnLoadMore(it.page))
-            }
-        }
-    ) { pokemon ->
-        PokemonItem(pokemon)
-    }
-}
+
 
 @Preview(apiLevel = 33, device = "id:Nexus 4")
 @Composable

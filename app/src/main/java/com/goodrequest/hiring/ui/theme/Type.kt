@@ -1,4 +1,4 @@
-package com.cvopa.peter.fetchy.ui.theme
+package com.goodrequest.hiring.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

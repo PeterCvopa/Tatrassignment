@@ -32,16 +32,12 @@ data class MoveData(
 )
 
 data class Sprites(
-    val front_default: String
+    @field:Json(name = "front_default")
+    val imageUrl: String
 )
 
 data class PokemonDetailResponse(
     val moves: List<Move>,
     val sprites: Sprites,
     val weight: Int,
-)
-
-data class PokemonWithDetail(
-    val name: String,
-    val detail: PokemonDetail?,
 )

@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.goodrequest.hiring.R
-import com.goodrequest.hiring.api.PokemonWithDetail
+import com.goodrequest.hiring.model.PokemonWithDetail
 
 
 @Composable
